@@ -13,13 +13,11 @@ export const fetchData = async (coord: Coordinates, delay = 0) => {
     const date = new Date();
     const lat = coord.latitude;
     const lng = coord.longitude;
-    const url = `${API_URL}?lat=${lat}&lng=${lng}&date=${date.toISOString().slice(0, 10)}`;
-    return fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        const { sunrise, sunset, day_length} = data.results;
-        return { sunrise, sunset, day_length };
-      })
+    const url = `${API_URL}?lat=${lat}&lng=${lng}&date=${date.toISOString().slice(0, 10)}&formatted=0`;
+    const response =  await fetch(url);
+    const data = await response.json();
+    const { sunrise, sunset, day_length} = data.results;
+    return { sunrise, sunset, day_length };
       //.catch(error => console.error(error));
 }
 export const getRandomCoords = () => {
@@ -48,25 +46,34 @@ export const multiplePointsFetch = async (coordinates: Coordinates[],chunkSize =
     return results;
     
 }
-export const convertToDate = (timeString: string) => {
-  const date = new Date();
-  const [hours, minutes, seconds] = timeString.split(':');
-  date.setHours(Number(hours));
-  date.setMinutes(Number(minutes));
-  date.setSeconds(Number(seconds));
-  return date;
-}
+
 export const getMinSunrise = (sunriseSunsetData: SunriseSunsetData[]) => {
 
-  const sortedData = sunriseSunsetData.sort((a, b) => {
-    const aDate = convertToDate(a.sunrise);
-    const bDate = convertToDate(b.sunrise);
-    return aDate.getTime() - bDate.getTime();
-  });
+  const initialData = { sunrise: "23:59:59 PM", day_length: '' };
+  const minSunrise = sunriseSunsetData.reduce((acc, curr) => {
+    if (curr.sunrise < acc.sunrise) {
+      acc.sunrise = curr.sunrise;
+      acc.day_length = curr.day_length;
+    } 
+    return acc;
+  }, initialData);
+  return [minSunrise.sunrise, minSunrise.day_length];
 
-  return [sortedData[0].sunrise, sortedData[0].day_length];
+  //return [sortedData[0].sunrise, sortedData[0].day_length];
 }
 /*
+getMinSunrise working version ->
+
+const sortedData = sunriseSunsetData.sort((a, b) => {
+    const aSunrise = new Date(`1970-01-01T${a.sunrise}`);
+    const bSunrise = new Date(`1970-01-01T${b.sunrise}`);
+    return aSunrise.getTime() - bSunrise.getTime();
+  });
+  return sortedData[0].sunrise;
+
+
+
+
 export const convertSunriseToTime = (sunrise: string): Date | null => {
     const sunriseParts = sunrise.split(":");
     if (sunriseParts.length !== 3) {
