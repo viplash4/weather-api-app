@@ -31,30 +31,34 @@ export const generateCoords = (n: number) => {
 }
 
 export const multiplePointsFetch = async (coordinates: Coordinates[],chunkSize = 5, delay = 0) =>{
-    const chunks = [];
+    const results: SunriseSunsetData[] = [];
     for (let i = 0; i < coordinates.length; i += chunkSize) {
         const chunk = coordinates.slice(i, i + chunkSize);
-        chunks.push(chunk);
-    }
-    const results: SunriseSunsetData[] = [];
-    for (const chunk of chunks) {
         const promises = chunk.map(coord => fetchData(coord, delay));
         const chunkResults = await Promise.all(promises);
         results.push(...chunkResults);
     }
     
+    /*
+    for (const chunk of chunks) {
+        const promises = chunk.map(coord => fetchData(coord, delay));
+        const chunkResults = await Promise.all(promises);
+        results.push(...chunkResults);
+    }
+    */
     return results;
     
 }
 
 export const getMinSunrise = (sunriseSunsetData: SunriseSunsetData[]) => {
 
-  const initialData = { sunrise: "23:59:59 PM", day_length: '' };
+  const initialData = sunriseSunsetData[0];
   const minSunrise = sunriseSunsetData.reduce((acc, curr) => {
-    if (curr.sunrise < acc.sunrise) {
-      acc.sunrise = curr.sunrise;
-      acc.day_length = curr.day_length;
+    if (curr.sunrise < acc.sunrise && curr.day_length !== 0) {
+      
+      return curr;
     } 
+    
     return acc;
   }, initialData);
   return [minSunrise.sunrise, minSunrise.day_length];
