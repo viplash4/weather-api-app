@@ -1,25 +1,29 @@
-import { generateCoords, multiplePointsFetch, getMinSunrise, getMaxSunrise } from "./getTaskSunset";
-import type  Coordinates  from './types/coordinates';
-import type  SunriseSunsetData  from './types/sunriseSunsetData';
+import {
+  generateCoords,
+  multiplePointsFetch,
+  getMinSunrise,
+  getMaxSunrise,
+} from "./getTaskSunset";
+import type Coordinates from "./types/coordinates";
+import type SunriseSunsetData from "./types/sunriseSunsetData";
 
-
-const express = require('express');
-const dotenv = require('dotenv');
+const express = require("express");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
 
-app.get('/', (req, res) => {
-  res.send('Hello user');
+app.get("/", (req, res) => {
+  res.send("Hello user");
 });
 
-app.get('/ping', (req, res) => {
-  res.send('Server is alive');
+app.get("/ping", (req, res) => {
+  res.send("Server is alive");
 });
 
-app.get('/sunsets/random', (req, res) => {
+app.get("/sunsets/random", (req, res) => {
   try {
     const count = req.query.count;
     (async () => {
@@ -28,16 +32,13 @@ app.get('/sunsets/random', (req, res) => {
       //console.log(data);
       res.send(data);
     })();
-    
-
-  }
-  catch(error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 });
 
-app.get('/sunsets/filter', (req, res) => {
+app.get("/sunsets/filter", (req, res) => {
   try {
     const count = req.query.count;
     const filter = req.query.filter;
@@ -46,29 +47,23 @@ app.get('/sunsets/filter', (req, res) => {
       const data: SunriseSunsetData[] = await multiplePointsFetch(coords);
       //console.log(data);
       console.log(data);
-      if (filter == 1){
+      if (filter == 1) {
         const filteredData = getMinSunrise(data);
         res.send(filteredData);
-      }
-      else {
+      } else {
         const filteredData = getMaxSunrise(data);
         res.send(filteredData);
       }
-
     })();
-    
-
-  }
-  catch(error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 });
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
-
 
 /*
 (async () => {

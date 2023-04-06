@@ -1,8 +1,5 @@
-
-
-
 export default interface SunriseSunsetData {
-    sunrise: string;
-    sunset: string;
-    day_length: number;
+  sunrise: string;
+  sunset: string;
+  day_length: number;
 }
