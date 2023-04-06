@@ -1,4 +1,4 @@
-import { generateCoords, multiplePointsFetch, getMinSunrise } from "./getTaskSunset";
+import { generateCoords, multiplePointsFetch, getMinSunrise, getMaxSunrise } from "./getTaskSunset";
 import type  Coordinates  from './types/coordinates';
 import type  SunriseSunsetData  from './types/sunriseSunsetData';
 
@@ -18,19 +18,53 @@ app.get('/', (req, res) => {
 app.get('/ping', (req, res) => {
   res.send('Server is alive');
 });
+
 app.get('/sunsets/random', (req, res) => {
   try {
     const count = req.query.count;
-    console.log(count);
-    res.send(count);
+    (async () => {
+      const coords: Coordinates[] = generateCoords(count);
+      const data: SunriseSunsetData[] = await multiplePointsFetch(coords);
+      //console.log(data);
+      res.send(data);
+    })();
+    
+
   }
   catch(error) {
     console.error(error);
     res.status(500).send('Server Error');
   }
-  
-  
 });
+
+app.get('/sunsets/filter', (req, res) => {
+  try {
+    const count = req.query.count;
+    const filter = req.query.filter;
+    (async () => {
+      const coords: Coordinates[] = generateCoords(count);
+      const data: SunriseSunsetData[] = await multiplePointsFetch(coords);
+      //console.log(data);
+      console.log(data);
+      if (filter == 1){
+        const filteredData = getMinSunrise(data);
+        res.send(filteredData);
+      }
+      else {
+        const filteredData = getMaxSunrise(data);
+        res.send(filteredData);
+      }
+
+    })();
+    
+
+  }
+  catch(error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+});
+
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
@@ -45,35 +79,4 @@ app.listen(port, () => {
   const minSunrise = getMinSunrise(data);
   console.log(minSunrise);
 })();
-*/
-
-
-
-
-
-/*(async () => {
-    for (const chunk of chunks) {
-      const promises = chunk.map(fetchData);
-      const results = await Promise.all(promises);
-      console.log("Processed chunk of coordinates:", chunk);
-      console.log("Results:", results);
-
-    }
-  })();
-  (async () => {
-  const results = await fetchData({latitude: 36.7201600, longitude: -4.4203400})
-  console.log(results);
-  })
-*/
-
-/*
-let earliestSunrise: string | null = null;
-chunks.forEach(async (chunk) => {
-  const results = await Promise.all(chunk.map(fetchData));
-  results.forEach((result) => {
-    if (!earliestSunrise || result.sunrise < earliestSunrise) {
-      earliestSunrise = result.sunrise;
-    }
-  });
-});
 */
