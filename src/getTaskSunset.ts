@@ -3,77 +3,76 @@ import type SunriseSunsetData from "./types/sunriseSunsetData";
 
 const API_URL = "https://api.sunrise-sunset.org/json";
 
-
 export const wait = (ms: number) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 export const fetchData = async (coord: Coordinates, delay = 0) => {
-    await wait(delay);
-    const date = new Date();
-    const lat = coord.latitude;
-    const lng = coord.longitude;
-    const url = `${API_URL}?lat=${lat}&lng=${lng}&date=${date.toISOString().slice(0, 10)}&formatted=0`;
-    const response =  await fetch(url);
-    const data = await response.json();
-    const { sunrise, sunset, day_length} = data.results;
-    return { sunrise, sunset, day_length };
-      //.catch(error => console.error(error));
-}
+  await wait(delay);
+  const date = new Date();
+  const lat = coord.latitude;
+  const lng = coord.longitude;
+  const url = `${API_URL}?lat=${lat}&lng=${lng}&date=${date
+    .toISOString()
+    .slice(0, 10)}&formatted=0`;
+  const response = await fetch(url);
+  const data = await response.json();
+  const { sunrise, sunset, day_length } = data.results;
+  return { sunrise, sunset, day_length };
+  //.catch(error => console.error(error));
+};
 export const getRandomCoords = () => {
-    const lat = Math.random() * (90 + 90) - 90;
-    const long = Math.random() * (180 + 180) - 180;
-    return { latitude: lat, longitude: long }
-}
+  const lat = Math.random() * (90 + 90) - 90;
+  const long = Math.random() * (180 + 180) - 180;
+  return { latitude: lat, longitude: long };
+};
 
 export const generateCoords = (n: number) => {
-    return Array.from({ length: n }, getRandomCoords);
-}
+  return Array.from({ length: n }, getRandomCoords);
+};
 
-export const multiplePointsFetch = async (coordinates: Coordinates[],chunkSize = 5, delay = 0) =>{
-    const results: SunriseSunsetData[] = [];
-    for (let i = 0; i < coordinates.length; i += chunkSize) {
-        const chunk = coordinates.slice(i, i + chunkSize);
-        const promises = chunk.map(coord => fetchData(coord, delay));
-        const chunkResults = await Promise.all(promises);
-        results.push(...chunkResults);
-    }
-    
-    /*
+export const multiplePointsFetch = async (
+  coordinates: Coordinates[],
+  chunkSize = 5,
+  delay = 0
+) => {
+  const results: SunriseSunsetData[] = [];
+  for (let i = 0; i < coordinates.length; i += chunkSize) {
+    const chunk = coordinates.slice(i, i + chunkSize);
+    const promises = chunk.map((coord) => fetchData(coord, delay));
+    const chunkResults = await Promise.all(promises);
+    results.push(...chunkResults);
+  }
+
+  /*
     for (const chunk of chunks) {
         const promises = chunk.map(coord => fetchData(coord, delay));
         const chunkResults = await Promise.all(promises);
         results.push(...chunkResults);
     }
     */
-    return results;
-    
-}
+  return results;
+};
 
 export const getMinSunrise = (sunriseSunsetData: SunriseSunsetData[]) => {
-
   const initialData = sunriseSunsetData[0];
   const minSunrise = sunriseSunsetData.reduce((acc, curr) => {
     if (curr.sunrise < acc.sunrise && curr.day_length !== 0) {
-      
       return curr;
-    } 
-    
+    }
+
     return acc;
   }, initialData);
-  return [minSunrise.sunrise, minSunrise.day_length]; 
-}
+  return [minSunrise.sunrise, minSunrise.day_length];
+};
 export const getMaxSunrise = (sunriseSunsetData: SunriseSunsetData[]) => {
-
   const initialData = sunriseSunsetData[0];
   const maxSunrise = sunriseSunsetData.reduce((acc, curr) => {
     if (curr.sunrise > acc.sunrise && curr.day_length !== 0) {
-      
       return curr;
-    } 
-    
+    }
+
     return acc;
   }, initialData);
-  return [maxSunrise.sunrise, maxSunrise.day_length]; 
-}
-
+  return [maxSunrise.sunrise, maxSunrise.day_length];
+};
