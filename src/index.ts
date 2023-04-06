@@ -3,6 +3,40 @@ import type  Coordinates  from './types/coordinates';
 import type  SunriseSunsetData  from './types/sunriseSunsetData';
 
 
+const express = require('express');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT;
+
+app.get('/', (req, res) => {
+  res.send('Hello user');
+});
+
+app.get('/ping', (req, res) => {
+  res.send('Server is alive');
+});
+app.get('/sunsets/random', (req, res) => {
+  try {
+    const count = req.query.count;
+    console.log(count);
+    res.send(count);
+  }
+  catch(error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+  
+  
+});
+app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+});
+
+
+/*
 (async () => {
   const coords: Coordinates[] = generateCoords(3);
   //console.log(coords);
@@ -11,7 +45,7 @@ import type  SunriseSunsetData  from './types/sunriseSunsetData';
   const minSunrise = getMinSunrise(data);
   console.log(minSunrise);
 })();
-
+*/
 
 
 
