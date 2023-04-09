@@ -16,6 +16,7 @@
     "typescript": "^5.0.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.17",
     "@types/node": "^18.15.11",
     "prettier": "2.8.7"
   }
