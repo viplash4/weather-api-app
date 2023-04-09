@@ -1,4 +1,4 @@
-import express from 'express';
+import express = require('express');
 
 import { index } from './routes/index';
 export const app = express();
