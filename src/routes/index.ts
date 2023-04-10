@@ -7,7 +7,7 @@ import {
 } from '../controller/sunset.controller';
 import Coordinates from '../types/coordinates';
 import SunriseSunsetData from '../types/sunriseSunsetData';
-
+import { CustomError } from '../middlewares/ErrorHandler';
 export const index = Router();
 
 index.get('/ping', async (req, res) => {
@@ -18,7 +18,7 @@ index.get('/sunsets/random', async (req, res) => {
     try {
         const count = Number(req.query.count);
         if (isNaN(count)) {
-            throw new Error('count must be number');
+            throw new CustomError(400, 'must be number');
         }
         const coords: Coordinates[] = generateCoords(count);
         const data: SunriseSunsetData[] = await multiplePointsFetch(coords);
