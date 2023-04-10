@@ -6,7 +6,7 @@ import {
     getMaxSunrise,
 } from '../controller/sunset.controller';
 import Coordinates from '../types/coordinates';
-import SunriseSunsetData from '../types/sunriseSunsetData';
+import { SunriseSunsetData } from '../types/sunriseSunsetData';
 import { CustomError } from '../middlewares/ErrorHandler';
 export const index = Router();
 

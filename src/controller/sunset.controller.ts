@@ -1,13 +1,28 @@
 import type Coordinates from '../types/coordinates';
-import type SunriseSunsetData from '../types/sunriseSunsetData';
-//import fetch from 'node-fetch';
+import type {
+    SunriseSunsetData,
+    SunriseSunsetResponse,
+} from '../types/sunriseSunsetData';
+
+import fetch from 'node-fetch';
 const API_URL = 'https://api.sunrise-sunset.org/json';
 
 export const wait = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
-
-export const fetchData = async (coord: Coordinates, delay = 0) => {
+function isSunriseSunsetResponse(
+    response: any
+): response is SunriseSunsetResponse {
+    return (
+        typeof response?.results?.sunrise === 'string' &&
+        typeof response.results?.sunset === 'string' &&
+        typeof response?.results?.day_length === 'number'
+    );
+}
+export const fetchData = async (
+    coord: Coordinates,
+    delay = 0
+): Promise<SunriseSunsetData> => {
     await wait(delay);
     const date = new Date();
     const lat = coord.latitude;
@@ -17,9 +32,15 @@ export const fetchData = async (coord: Coordinates, delay = 0) => {
         .slice(0, 10)}&formatted=0`;
     const response = await fetch(url);
     const data = await response.json();
+    if (!response.ok || !isSunriseSunsetResponse(data)) {
+        console.log(data);
+        throw new Error(
+            `Failed to fetch sunrise/sunset times for ${lat}, ${lng}`
+        );
+    }
     const { sunrise, sunset, day_length } = data.results;
+
     return { sunrise, sunset, day_length };
-    //.catch(error => console.error(error));
 };
 export const getRandomCoords = () => {
     const lat = Math.random() * (90 + 90) - 90;
@@ -43,14 +64,6 @@ export const multiplePointsFetch = async (
         const chunkResults = await Promise.all(promises);
         results.push(...chunkResults);
     }
-
-    /*
-    for (const chunk of chunks) {
-        const promises = chunk.map(coord => fetchData(coord, delay));
-        const chunkResults = await Promise.all(promises);
-        results.push(...chunkResults);
-    }
-    */
     return results;
 };
 
