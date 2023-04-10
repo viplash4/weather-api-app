@@ -4,7 +4,6 @@ import type {
     SunriseSunsetResponse,
 } from '../types/sunriseSunsetData';
 
-import fetch from 'node-fetch';
 const API_URL = 'https://api.sunrise-sunset.org/json';
 
 export const wait = (ms: number) => {
