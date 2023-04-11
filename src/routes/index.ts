@@ -11,8 +11,13 @@ import { CustomError } from '../middlewares/ErrorHandler';
 
 export const index = Router();
 
-index.get('/ping', async (req, res) => {
-    res.send('Server is alive');
+index.get('/ping', async (req, res, next) => {
+    try {
+        res.send('Server is alive');
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 });
 
 index.get('/sunsets/random', async (req, res, next) => {
@@ -30,15 +35,15 @@ index.get('/sunsets/random', async (req, res, next) => {
         next(error);
     }
 });
-index.get('/sunsets/filter', async (req, res) => {
+index.get('/sunsets/filter', async (req, res, next) => {
     try {
         const count = Number(req.query.count);
         if (isNaN(count)) {
-            throw new Error('count must be number');
+            throw new CustomError(401, 'count must be number');
         }
         const filter = Number(req.query.filter);
         if (isNaN(filter)) {
-            throw new Error('filter must be number');
+            throw new CustomError(401, 'filter must be number');
         }
 
         const coords: Coordinates[] = generateCoords(count);
@@ -54,6 +59,6 @@ index.get('/sunsets/filter', async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).send('Server Error');
+        next(error);
     }
 });

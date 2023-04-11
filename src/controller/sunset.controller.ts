@@ -3,7 +3,7 @@ import type {
     SunriseSunsetData,
     SunriseSunsetResponse,
 } from '../types/sunriseSunsetData';
-
+import { CustomError } from '../middlewares/ErrorHandler';
 const API_URL = 'https://api.sunrise-sunset.org/json';
 
 export const wait = (ms: number) => {
@@ -33,7 +33,8 @@ export const fetchData = async (
     const data = await response.json();
     if (!response.ok || !isSunriseSunsetResponse(data)) {
         console.log(data);
-        throw new Error(
+        throw new CustomError(
+            500,
             `Failed to fetch sunrise/sunset times for ${lat}, ${lng}`
         );
     }
