@@ -1,5 +1,3 @@
 node_modules
 lib
 .env
-Dockerfile
-.dockerignore
