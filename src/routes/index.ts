@@ -8,7 +8,7 @@ import {
 import Coordinates from '../types/coordinates';
 import { SunriseSunsetData } from '../types/sunriseSunsetData';
 import { CustomError } from '../middlewares/ErrorHandler';
-import { User } from '../models/User';
+import User from '../models/User';
 
 export const index = Router();
 
@@ -65,10 +65,12 @@ index.get('/sunsets/filter', async (req, res, next) => {
 });
 index.post('/users', async (req, res, next) => {
     try {
-        const user = new User();
-        user.name = req.body.name;
-        user.password = req.body.password;
-        await user.save();
+        console.log(req.body);
+        const user = await User.create({
+            name: req.body.name,
+            password: req.body.password,
+        });
+
         res.json(user);
     } catch (error) {
         console.log(error);
