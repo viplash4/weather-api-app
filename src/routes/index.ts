@@ -8,6 +8,7 @@ import {
 import Coordinates from '../types/coordinates';
 import { SunriseSunsetData } from '../types/sunriseSunsetData';
 import { CustomError } from '../middlewares/ErrorHandler';
+import { User } from '../models/User';
 
 export const index = Router();
 
@@ -59,6 +60,28 @@ index.get('/sunsets/filter', async (req, res, next) => {
         }
     } catch (error) {
         console.error(error);
+        next(error);
+    }
+});
+index.post('/users', async (req, res, next) => {
+    try {
+        const user = new User();
+        user.name = req.body.name;
+        user.password = req.body.password;
+        await user.save();
+        res.json(user);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+index.get('/getusers', async (req, res, next) => {
+    try {
+        const users = await User.findAll();
+        res.json(users);
+    } catch (error) {
+        console.log(error);
         next(error);
     }
 });
