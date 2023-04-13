@@ -26,3 +26,12 @@ index.get('/getusers', async (req, res, next) => {
         next(error);
     }
 });
+index.delete('/dropusers', async (req, res, next) => {
+    try {
+        await User.destroy({ where: {} });
+        res.send('All users have been deleted.');
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
