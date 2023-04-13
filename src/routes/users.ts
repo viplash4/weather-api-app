@@ -5,11 +5,13 @@ import {
     checkEmailExistance,
     isEmailValid,
 } from '../controller/users.controller';
+import * as bcrypt from 'bcrypt';
 export const index = Router();
 
 index.post('/setuser', async (req, res, next) => {
     try {
         console.log(req.body);
+        //typeguard
         const { name, email, password, birthDate } = req.body;
         if (!isEmailValid(email)) {
             throw new CustomError(400, `Invalid email format`);
@@ -17,7 +19,13 @@ index.post('/setuser', async (req, res, next) => {
         if (await checkEmailExistance(email)) {
             throw new CustomError(409, `Email already registered`);
         }
-        const user = await User.create({ name, email, password, birthDate });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            birthDate,
+        });
 
         res.json(user);
     } catch (error) {
