@@ -1,4 +1,4 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { database } from '../config/database';
 
 const User = database.define('User', {
@@ -7,6 +7,12 @@ const User = database.define('User', {
     },
     password: {
         type: DataTypes.STRING,
+    },
+    email: {
+        type: DataTypes.STRING,
+    },
+    birthDate: {
+        type: DataTypes.DATEONLY,
     },
 });
 
