@@ -1,14 +1,23 @@
 import { CustomError } from '../middlewares/ErrorHandler';
 import { Router } from 'express';
 import User from '../models/User';
+import {
+    checkEmailExistance,
+    isEmailValid,
+} from '../controller/users.controller';
 export const index = Router();
-index.post('/users', async (req, res, next) => {
+
+index.post('/setuser', async (req, res, next) => {
     try {
         console.log(req.body);
-        const user = await User.create({
-            name: req.body.name,
-            password: req.body.password,
-        });
+        const { name, email, password, birthDate } = req.body;
+        if (!isEmailValid(email)) {
+            throw new CustomError(400, `Invalid email format`);
+        }
+        if (await checkEmailExistance(email)) {
+            throw new CustomError(409, `Email already registered`);
+        }
+        const user = await User.create({ name, email, password, birthDate });
 
         res.json(user);
     } catch (error) {
