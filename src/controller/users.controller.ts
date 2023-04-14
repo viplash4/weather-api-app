@@ -1,6 +1,6 @@
 import { CustomError } from '../middlewares/ErrorHandler';
 import User from '../models/User';
-import { userRequest } from '../types/userData';
+import { userData, userRequest } from '../types/userData';
 import bcrypt from 'bcrypt';
 
 export const isEmailValid = (email) => {
@@ -13,12 +13,12 @@ export const checkEmailExistance = async (email) => {
     return foundedUser !== null && foundedUser !== undefined;
 };
 
-export const isUserRequest = (req): req is userRequest => {
+export const isUserRequest = (req): req is userData => {
     return (
-        typeof req?.request?.name === 'string' &&
-        typeof req?.request?.password === 'string' &&
-        typeof req?.request?.email === 'string' &&
-        typeof req?.body?.birthDate === 'string'
+        typeof req?.name === 'string' &&
+        typeof req?.password === 'string' &&
+        typeof req?.email === 'string' &&
+        typeof req?.birthDate === 'string'
         //todo: birthDate
     );
 };

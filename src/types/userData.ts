@@ -2,7 +2,7 @@ export interface userData {
     name: string;
     password: string;
     email: string;
-    birthDate: Date;
+    birthDate: string;
 }
 export interface userRequest {
     request: userData;
