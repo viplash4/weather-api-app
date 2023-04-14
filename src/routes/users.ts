@@ -4,6 +4,7 @@ import User from '../models/User';
 import {
     checkEmailExistance,
     isEmailValid,
+    isUserRequest,
 } from '../controller/users.controller';
 import * as bcrypt from 'bcrypt';
 export const index = Router();
@@ -11,6 +12,9 @@ export const index = Router();
 index.post('/setuser', async (req, res, next) => {
     try {
         console.log(req.body);
+        if (!isUserRequest(req.body)) {
+            throw new CustomError(400, `Invalid request format`);
+        }
         //typeguard
         const { name, email, password, birthDate } = req.body;
         if (!isEmailValid(email)) {
