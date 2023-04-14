@@ -1,36 +1,13 @@
-import { CustomError } from '../middlewares/ErrorHandler';
 import { Router } from 'express';
 import User from '../models/User';
-import {
-    checkEmailExistance,
-    isEmailValid,
-    isUserRequest,
-} from '../controller/users.controller';
-import * as bcrypt from 'bcrypt';
-export const index = Router();
+import { createUser } from '../controller/users.controller';
 
-index.post('/setuser', async (req, res, next) => {
+const userRouter = Router();
+
+userRouter.post('/setuser', async (req, res, next) => {
     try {
         console.log(req.body);
-        if (!isUserRequest(req.body)) {
-            throw new CustomError(400, `Invalid request format`);
-        }
-        //typeguard
-        const { name, email, password, birthDate } = req.body;
-        if (!isEmailValid(email)) {
-            throw new CustomError(400, `Invalid email format`);
-        }
-        if (await checkEmailExistance(email)) {
-            throw new CustomError(409, `Email already registered`);
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            birthDate,
-        });
-
+        const user = await createUser(req.body);
         res.json(user);
     } catch (error) {
         console.log(error);
@@ -38,7 +15,7 @@ index.post('/setuser', async (req, res, next) => {
     }
 });
 
-index.get('/getusers', async (req, res, next) => {
+userRouter.get('/getusers', async (req, res, next) => {
     try {
         const users = await User.findAll();
         res.json(users);
@@ -47,7 +24,7 @@ index.get('/getusers', async (req, res, next) => {
         next(error);
     }
 });
-index.delete('/dropusers', async (req, res, next) => {
+userRouter.delete('/dropusers', async (req, res, next) => {
     try {
         await User.destroy({ where: {} });
         res.send('All users have been deleted.');
@@ -56,3 +33,5 @@ index.delete('/dropusers', async (req, res, next) => {
         next(error);
     }
 });
+
+export default userRouter;
