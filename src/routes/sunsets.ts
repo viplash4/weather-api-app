@@ -9,9 +9,9 @@ import Coordinates from '../types/coordinates';
 import { SunriseSunsetData } from '../types/sunriseSunsetData';
 import { CustomError } from '../middlewares/ErrorHandler';
 
-export const index = Router();
+const sunsetRouter = Router();
 
-index.get('/ping', async (req, res, next) => {
+sunsetRouter.get('/ping', async (req, res, next) => {
     try {
         res.send('Server is alive');
     } catch (error) {
@@ -20,7 +20,7 @@ index.get('/ping', async (req, res, next) => {
     }
 });
 
-index.get('/random', async (req, res, next) => {
+sunsetRouter.get('/random', async (req, res, next) => {
     try {
         const count = Number(req.query.count);
         if (isNaN(count)) {
@@ -35,7 +35,7 @@ index.get('/random', async (req, res, next) => {
         next(error);
     }
 });
-index.get('/filter', async (req, res, next) => {
+sunsetRouter.get('/filter', async (req, res, next) => {
     try {
         const count = Number(req.query.count);
         if (isNaN(count)) {
@@ -62,3 +62,5 @@ index.get('/filter', async (req, res, next) => {
         next(error);
     }
 });
+
+export default sunsetRouter;

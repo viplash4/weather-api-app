@@ -4,6 +4,3 @@ export interface userData {
     email: string;
     birthDate: string;
 }
-export interface userRequest {
-    request: userData;
-}
