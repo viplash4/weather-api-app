@@ -1,7 +1,9 @@
 import { CustomError } from '../middlewares/ErrorHandler';
 import User from '../models/User';
+import { userAuth } from '../types/userAuth';
 import { userData } from '../types/userData';
 import * as bcrypt from 'bcrypt';
+
 export const isEmailValid = (email: string) => {
     const regEx = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     return regEx.test(email);
@@ -20,6 +22,9 @@ export const isUserRequest = (req): req is userData => {
         typeof req?.birthDate === 'string'
         //todo: birthDate
     );
+};
+export const isUserAuth = (req): req is userAuth => {
+    return typeof req?.email === 'string' && typeof req?.password === 'string';
 };
 export const createUser = async (req: userData) => {
     if (!isUserRequest(req)) {
@@ -42,6 +47,24 @@ export const createUser = async (req: userData) => {
         password: hashedPassword,
         birthDate,
     });
+
+    return user;
+};
+
+export const authenticateUser = async (req: userAuth) => {
+    if (!isUserAuth(req)) {
+        throw new CustomError(400, `Invalid request format`);
+    }
+    const { email, password } = req;
+    const user = await User.findOne({ where: { email } });
+    if (!isUserRequest(user)) {
+        throw new CustomError(400, `Invalid request format`);
+    } else {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new CustomError(401, `Invalid email or password`);
+        }
+    }
 
     return user;
 };

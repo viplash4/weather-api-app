@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import User from '../models/User';
-import { createUser } from '../controller/users.controller';
+import { authenticateUser, createUser } from '../controller/users.controller';
 
 const userRouter = Router();
 
@@ -33,5 +33,14 @@ userRouter.delete('/dropusers', async (req, res, next) => {
         next(error);
     }
 });
-
+userRouter.post('/authuser', async (req, res, next) => {
+    try {
+        console.log(req.body);
+        const user = await authenticateUser(req.body);
+        res.json(user);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
 export default userRouter;
