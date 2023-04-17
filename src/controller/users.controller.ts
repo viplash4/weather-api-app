@@ -23,14 +23,16 @@ export const isUserRequest = (req): req is userData => {
         //todo: birthDate
     );
 };
-export const isUserAuth = (req): req is userAuth => {
-    return typeof req?.email === 'string' && typeof req?.password === 'string';
+export const isUserAuth = (data): data is userAuth => {
+    return (
+        typeof data?.email === 'string' && typeof data?.password === 'string'
+    );
 };
-export const createUser = async (req: userData) => {
-    if (!isUserRequest(req)) {
+export const createUser = async (data: userData) => {
+    if (!isUserRequest(data)) {
         throw new CustomError(400, `Invalid request format`);
     }
-    const { name, email, password, birthDate } = req;
+    const { name, email, password, birthDate } = data;
     if (!isEmailValid(email)) {
         throw new CustomError(400, `Invalid email format`);
     }
@@ -51,19 +53,18 @@ export const createUser = async (req: userData) => {
     return user;
 };
 
-export const authenticateUser = async (req: userAuth) => {
-    if (!isUserAuth(req)) {
+export const authenticateUser = async (data: userAuth) => {
+    if (!isUserAuth(data)) {
         throw new CustomError(400, `Invalid request format`);
     }
-    const { email, password } = req;
+    const { email, password } = data;
     const user = await User.findOne({ where: { email } });
     if (!isUserRequest(user)) {
         throw new CustomError(400, `Invalid request format`);
-    } else {
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            throw new CustomError(401, `Invalid email or password`);
-        }
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new CustomError(401, `Invalid email or password`);
     }
 
     return user;
