@@ -1,5 +1,5 @@
+import { initDatabase } from '../config/database';
 import { CustomError } from '../middlewares/ErrorHandler';
-import User from '../models/User';
 import { userAuth } from '../types/userAuth';
 import { userData } from '../types/userData';
 import * as bcrypt from 'bcrypt';
@@ -10,7 +10,9 @@ export const isEmailValid = (email: string) => {
 };
 
 export const checkEmailExistance = async (email: string) => {
-    const foundedUser = await User.findOne({ where: { email } });
+    const foundedUser = (await initDatabase()).models.User.findOne({
+        where: { email },
+    });
     return foundedUser !== null && foundedUser !== undefined;
 };
 
@@ -43,7 +45,7 @@ export const createUser = async (data: userData) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const user = (await initDatabase()).models.User.create({
         name,
         email,
         password: hashedPassword,
@@ -58,7 +60,9 @@ export const authenticateUser = async (data: userAuth) => {
         throw new CustomError(400, `Invalid request format`);
     }
     const { email, password } = data;
-    const user = await User.findOne({ where: { email } });
+    const user = (await initDatabase()).models.User.findOne({
+        where: { email },
+    });
     if (!isUserRequest(user)) {
         throw new CustomError(400, `Invalid request format`);
     }

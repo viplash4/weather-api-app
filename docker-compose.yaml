@@ -8,13 +8,20 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    networks:
+      - app-network
   api:
-    container_name: api
-    restart: on-failure
     depends_on:
       - postgres
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "${PORT}:${PORT}"
     volumes:
       - .:/usr/src/app
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
