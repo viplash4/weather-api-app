@@ -1,27 +1,27 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:latest
-    ports:
-      - "35432:${DB_PORT}"
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-    networks:
-      - app-network
-  api:
-    depends_on:
-      - postgres
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "${PORT}:${PORT}"
-    volumes:
-      - .:/usr/src/app
-    networks:
-      - app-network
+    postgres:
+        image: postgres:latest
+        ports:
+            - '35432:${DB_PORT}'
+        environment:
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=${DB_NAME}
+        networks:
+            - app-network
+    api:
+        depends_on:
+            - postgres
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - '${PORT}:${PORT}'
+        volumes:
+            - .:/usr/src/app
+        networks:
+            - app-network
 networks:
-  app-network:
-    driver: bridge
+    app-network:
+        driver: bridge
