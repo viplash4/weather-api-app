@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import User from '../models/User';
 import { authenticateUser, createUser } from '../controller/users.controller';
+import { initDatabase } from '../config/database';
 
 const userRouter = Router();
 
@@ -17,7 +17,7 @@ userRouter.post('/setuser', async (req, res, next) => {
 
 userRouter.get('/getusers', async (req, res, next) => {
     try {
-        const users = await User.findAll();
+        const users = (await initDatabase()).models.User.findAll();
         res.json(users);
     } catch (error) {
         console.log(error);
@@ -26,7 +26,7 @@ userRouter.get('/getusers', async (req, res, next) => {
 });
 userRouter.delete('/dropusers', async (req, res, next) => {
     try {
-        await User.destroy({ where: {} });
+        (await initDatabase()).models.User.destroy({ where: {} });
         res.send('All users have been deleted.');
     } catch (error) {
         console.log(error);
