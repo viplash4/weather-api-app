@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import User from '../models/User';
-import { authenticateUser, createUser } from '../controller/users.controller';
+import {
+    authenticateUser,
+    createUser,
+    generateToken,
+} from '../controller/users.controller';
+import authenticateToken from '../middlewares/TokenAuth';
 
 const userRouter = Router();
 
@@ -15,7 +20,7 @@ userRouter.post('/setuser', async (req, res, next) => {
     }
 });
 
-userRouter.get('/getusers', async (req, res, next) => {
+userRouter.get('/getusers', authenticateToken, async (req, res, next) => {
     try {
         const users = await User.findAll();
         res.json(users);
@@ -24,7 +29,7 @@ userRouter.get('/getusers', async (req, res, next) => {
         next(error);
     }
 });
-userRouter.delete('/dropusers', async (req, res, next) => {
+userRouter.delete('/dropusers', authenticateToken, async (req, res, next) => {
     try {
         await User.destroy({ where: {} });
         res.send('All users have been deleted.');
@@ -37,7 +42,8 @@ userRouter.post('/authuser', async (req, res, next) => {
     try {
         console.log(req.body);
         const user = await authenticateUser(req.body);
-        res.json(user);
+        const token = generateToken({ data: req.body.email });
+        res.json(token);
     } catch (error) {
         console.log(error);
         next(error);
