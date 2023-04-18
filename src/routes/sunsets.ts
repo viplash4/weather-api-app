@@ -8,6 +8,7 @@ import {
 import Coordinates from '../types/coordinates';
 import { SunriseSunsetData } from '../types/sunriseSunsetData';
 import { CustomError } from '../middlewares/ErrorHandler';
+import authenticateToken from '../middlewares/TokenAuth';
 
 const sunsetRouter = Router();
 
@@ -20,7 +21,7 @@ sunsetRouter.get('/ping', async (req, res, next) => {
     }
 });
 
-sunsetRouter.get('/random', async (req, res, next) => {
+sunsetRouter.get('/random', authenticateToken, async (req, res, next) => {
     try {
         const count = Number(req.query.count);
         if (isNaN(count)) {
@@ -35,7 +36,7 @@ sunsetRouter.get('/random', async (req, res, next) => {
         next(error);
     }
 });
-sunsetRouter.get('/filter', async (req, res, next) => {
+sunsetRouter.get('/filter', authenticateToken, async (req, res, next) => {
     try {
         const count = Number(req.query.count);
         if (isNaN(count)) {
