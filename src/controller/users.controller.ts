@@ -4,6 +4,8 @@ import { userAuth } from '../types/userAuth';
 import { userData } from '../types/userData';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const isEmailValid = (email: string) => {
     const regEx = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -54,7 +56,7 @@ export const createUser = async (data: userData) => {
     return user;
 };
 export const generateToken = (data) => {
-    return jwt.sign(data, 'j351e', { expiresIn: '1800s' });
+    return jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 };
 export const authenticateUser = async (data: userAuth) => {
     if (!isUserAuth(data)) {

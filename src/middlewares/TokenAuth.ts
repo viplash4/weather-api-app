@@ -1,8 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 import { CustomError } from '../middlewares/ErrorHandler';
 import { Request, Response, NextFunction } from 'express';
+import * as dotenv from 'dotenv';
+
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-    const token_secret = 'j351e';
+    dotenv.config();
     const authHeader = req.headers['authorization'];
     try {
         if (!authHeader) throw new CustomError(401, 'No token provided');
@@ -13,7 +15,9 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
             throw new CustomError(401, 'Invalid authorization header format');
         }
 
-        const decoded = jwt.verify(token, token_secret) as { data: string };
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET) as {
+            data: string;
+        };
 
         if (!decoded.data) throw new CustomError(401, 'Invalid token');
 
