@@ -11,6 +11,7 @@ services:
         networks:
             - app-network
     api:
+        restart: always
         depends_on:
             - postgres
         build:
