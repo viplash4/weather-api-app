@@ -1,11 +1,11 @@
 import { CustomError } from '../middlewares/ErrorHandler';
 import User from '../models/User';
-import { userAuth } from '../types/userAuth';
-import { userData } from '../types/userData';
+import { loginUserDTO } from '../types/loginUserDTO';
+import { createUserDTO } from '../types/createUserDTO';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import * as dotenv from 'dotenv';
-dotenv.config();
+
+import environment from '../config/environment';
 
 export const isEmailValid = (email: string) => {
     const regEx = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -17,22 +17,21 @@ export const checkEmailExistance = async (email: string) => {
     return foundedUser !== null && foundedUser !== undefined;
 };
 
-export const isUserRequest = (req): req is userData => {
+export const isCreateUserDTO = (data): data is createUserDTO => {
     return (
-        typeof req?.name === 'string' &&
-        typeof req?.password === 'string' &&
-        typeof req?.email === 'string' &&
-        typeof req?.birthDate === 'string'
-        //todo: birthDate
+        typeof data?.name === 'string' &&
+        typeof data?.password === 'string' &&
+        typeof data?.email === 'string' &&
+        typeof data?.birthDate === 'string'
     );
 };
-export const isUserAuth = (data): data is userAuth => {
+export const isLoginUserDTO = (data): data is loginUserDTO => {
     return (
         typeof data?.email === 'string' && typeof data?.password === 'string'
     );
 };
-export const createUser = async (data: userData) => {
-    if (!isUserRequest(data)) {
+export const createUser = async (data: createUserDTO) => {
+    if (!isCreateUserDTO(data)) {
         throw new CustomError(400, `Invalid request format`);
     }
     const { name, email, password, birthDate } = data;
@@ -56,15 +55,15 @@ export const createUser = async (data: userData) => {
     return user;
 };
 export const generateToken = (data) => {
-    return jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    return jwt.sign(data, environment.secret_token, { expiresIn: '1800s' });
 };
-export const authenticateUser = async (data: userAuth) => {
-    if (!isUserAuth(data)) {
+export const authenticateUser = async (data: loginUserDTO) => {
+    if (!isLoginUserDTO(data)) {
         throw new CustomError(400, `Invalid request format`);
     }
     const { email, password } = data;
     const user = await User.findOne({ where: { email } });
-    if (!isUserRequest(user)) {
+    if (!isCreateUserDTO(user)) {
         throw new CustomError(400, `Invalid request format`);
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
