@@ -1,6 +1,6 @@
-import { createUser } from '../controller/users.controller';
+import { createUser } from '../src/controller/users.controller';
 
-import User from '../models/User';
+import User from '../src/models/User';
 
 describe('User model', () => {
     beforeAll(async () => {

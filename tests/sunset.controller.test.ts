@@ -3,7 +3,7 @@ import {
     generateCoords,
     getRandomCoords,
     multiplePointsFetch,
-} from '../controller/sunset.controller';
+} from '../src/controller/sunset.controller';
 
 describe('fetchData', () => {
     it('should fetch data from sunrise-sunset API', async () => {
