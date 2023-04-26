@@ -13,10 +13,10 @@ describe('User model', () => {
 
     test('should create a new user', async () => {
         const userData = {
-            name: 'John Doe',
-            email: 'johndoe@example.com',
+            name: 'Soap',
+            email: 'soap01@example.com',
             password: 'password',
-            birthDate: '1990-01-01',
+            birthDate: '1991-01-01',
         };
 
         const user = await createUser(userData);
