@@ -1,10 +1,15 @@
 import { Router } from 'express';
-import { fetchTriviaQuestions } from '../controller/trivia.controller';
+import {
+    fetchTriviaQuestions,
+    sendTriviaQuestionsToRabbitMQ,
+} from '../controller/trivia.controller';
 const triviaRouter = Router();
 
 triviaRouter.get('/', async (req, res, next) => {
     try {
-        await fetchTriviaQuestions();
+        const questions = await fetchTriviaQuestions();
+        console.log(questions);
+        await sendTriviaQuestionsToRabbitMQ(questions);
         res.send('Trivia questions processing started');
     } catch (err) {
         next(err);
