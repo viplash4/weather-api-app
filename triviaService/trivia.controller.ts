@@ -1,7 +1,8 @@
 import * as JSONStream from 'JSONStream';
 import fetch from 'node-fetch';
-import * as through2 from 'through2';
+
 import * as amqp from 'amqplib';
+import { Transform } from 'stream';
 
 export const fetchTriviaQuestions = async () => {
     const API_URL = 'https://opentdb.com/api.php?amount=10';
@@ -12,9 +13,12 @@ export const fetchTriviaQuestions = async () => {
         JSONStream.parse('results.*')
     );
 
-    const transformStream = through2.obj((question, _, callback) => {
-        questions.push(question);
-        callback(null, question);
+    const transformStream = new Transform({
+        objectMode: true,
+        transform: (chunk, encoding, callback) => {
+            questions.push(chunk);
+            callback(null, chunk);
+        },
     });
 
     return new Promise((resolve, reject) => {

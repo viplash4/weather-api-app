@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
     fetchTriviaQuestions,
     sendTriviaQuestionsToRabbitMQ,
-} from '../controller/trivia.controller';
+} from '../../triviaService/trivia.controller';
 const triviaRouter = Router();
 
 triviaRouter.get('/', async (req, res, next) => {
