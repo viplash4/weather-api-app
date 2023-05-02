@@ -4,8 +4,8 @@ import fetch from 'node-fetch';
 import * as amqp from 'amqplib';
 import { Transform } from 'stream';
 
-export const fetchTriviaQuestions = async () => {
-    const API_URL = 'https://opentdb.com/api.php?amount=10';
+export const fetchTriviaQuestions = async (questionNumber) => {
+    const API_URL = `https://opentdb.com/api.php?amount=${questionNumber}`;
 
     const questions = [];
 
