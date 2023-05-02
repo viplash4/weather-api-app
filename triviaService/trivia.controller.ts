@@ -33,16 +33,19 @@ export const fetchTriviaQuestions = async (questionNumber) => {
     });
 };
 
-export const sendTriviaQuestionsToRabbitMQ = async (questions) => {
+export const sendTriviaQuestionsToRabbitMQ = async (
+    rabbitMqConnection,
+    questions
+) => {
     try {
-        const connection = await amqp.connect('amqp://localhost:5672');
-        const channel = await connection.createChannel();
-
         const queue = 'trivia-questions';
-        await channel.assertQueue(queue);
+        await rabbitMqConnection.channel.assertQueue(queue);
 
         for (const question of questions) {
-            channel.sendToQueue(queue, Buffer.from(JSON.stringify(question)));
+            rabbitMqConnection.channel.sendToQueue(
+                queue,
+                Buffer.from(JSON.stringify(question))
+            );
         }
 
         console.log('Trivia questions sent to RabbitMQ');

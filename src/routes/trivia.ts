@@ -4,6 +4,7 @@ import {
     sendTriviaQuestionsToRabbitMQ,
 } from '../../triviaService/trivia.controller';
 import { CustomError } from '../middlewares/ErrorHandler';
+import { connectToRabbitMQ } from '../rabbitmq';
 const triviaRouter = Router();
 
 triviaRouter.get('/', async (req, res, next) => {
@@ -14,7 +15,8 @@ triviaRouter.get('/', async (req, res, next) => {
         }
         const questions = await fetchTriviaQuestions(questionNumber);
         console.log(questions);
-        await sendTriviaQuestionsToRabbitMQ(questions);
+        const rabbitMqConnection = await connectToRabbitMQ();
+        await sendTriviaQuestionsToRabbitMQ(rabbitMqConnection, questions);
         res.send('Trivia questions processing started');
     } catch (err) {
         next(err);
