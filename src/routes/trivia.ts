@@ -1,9 +1,4 @@
 import { Router } from 'express';
-import {
-    fetchTriviaQuestions,
-    sendTriviaQuestionsToRabbitMQ,
-} from '../controller/trivia.controller';
-import { CustomError } from '../middlewares/ErrorHandler';
 
 import { addToQueue } from '../producer';
 

@@ -5,7 +5,7 @@ export const connect = async () => {
     let connection;
     while (!connection) {
         try {
-            connection = await amqp.connect(process.env?.RABBIT_MQ_URL);
+            connection = await amqp.connect('amqp://localhost:5672');
         } catch {
             await wait(2000);
         }
