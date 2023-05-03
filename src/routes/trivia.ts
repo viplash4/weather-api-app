@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { addToQueue } from '../producer';
+import { addToQueue } from '../config/producer';
 
 const triviaRouter = Router();
 

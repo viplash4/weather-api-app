@@ -2,8 +2,8 @@ import * as amqp from 'amqplib';
 import {
     fetchTriviaQuestions,
     sendTriviaQuestionsToRabbitMQ,
-} from './controller/trivia.controller';
-import { CustomError } from './middlewares/ErrorHandler';
+} from '../controller/trivia.controller';
+import { CustomError } from '../middlewares/ErrorHandler';
 
 let channel;
 
