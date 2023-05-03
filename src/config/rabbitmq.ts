@@ -1,4 +1,4 @@
-import { RabbitMqConnection } from './types/RabbitMQConnection';
+import { RabbitMqConnection } from '../types/RabbitMQConnection';
 import * as amqp from 'amqplib';
 export const connectToRabbitMQ = async (): Promise<RabbitMqConnection> => {
     const connection = await amqp.connect('amqp://localhost:5672');

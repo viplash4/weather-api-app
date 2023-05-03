@@ -1,7 +1,6 @@
 import * as JSONStream from 'JSONStream';
 import fetch from 'node-fetch';
 
-import * as amqp from 'amqplib';
 import { Transform } from 'stream';
 
 export const fetchTriviaQuestions = async (questionNumber) => {
@@ -39,10 +38,10 @@ export const sendTriviaQuestionsToRabbitMQ = async (
 ) => {
     try {
         const queue = 'trivia-questions';
-        await rabbitMqConnection.channel.assertQueue(queue);
+        await rabbitMqConnection.assertQueue(queue);
 
         for (const question of questions) {
-            rabbitMqConnection.channel.sendToQueue(
+            rabbitMqConnection.sendToQueue(
                 queue,
                 Buffer.from(JSON.stringify(question))
             );
