@@ -1,54 +1,30 @@
-import * as JSONStream from 'JSONStream';
-import fetch from 'node-fetch';
+import { connectToRabbit } from '../config/rabbitmq';
+import { CustomError } from '../middlewares/ErrorHandler';
 
-import { Transform } from 'stream';
-
-export const fetchTriviaQuestions = async (questionNumber) => {
-    const API_URL = `https://opentdb.com/api.php?amount=${questionNumber}`;
-
-    const questions = [];
-
-    const readableStream = (await fetch(API_URL)).body.pipe(
-        JSONStream.parse('results.*')
-    );
-
-    const transformStream = new Transform({
-        objectMode: true,
-        transform: (chunk, encoding, callback) => {
-            questions.push(chunk);
-            callback(null, chunk);
-        },
-    });
-
-    return new Promise((resolve, reject) => {
-        readableStream
-            .pipe(transformStream)
-            .on('finish', () => {
-                resolve(questions);
-            })
-            .on('error', (err) => {
-                reject(err);
-            });
-    });
-};
-
-export const sendTriviaQuestionsToRabbitMQ = async (
-    rabbitMqConnection,
-    questions
-) => {
+export const sendTriviaQuestionsToRabbitMQ = async (question) => {
     try {
         const queue = 'trivia-questions';
-        await rabbitMqConnection.assertQueue(queue);
+        const channel = await connectToRabbit();
 
-        for (const question of questions) {
-            rabbitMqConnection.sendToQueue(
-                queue,
-                Buffer.from(JSON.stringify(question))
-            );
-        }
-
-        console.log('Trivia questions sent to RabbitMQ');
+        await channel.assertQueue(queue);
+        channel.sendToQueue(queue, Buffer.from(JSON.stringify(question)));
     } catch (err) {
         console.error(err);
+    }
+};
+
+export const addToQueue = async (request, response) => {
+    try {
+        const questionNumber = Number(request.query.number);
+        if (isNaN(questionNumber)) {
+            throw new CustomError(401, 'Count must be a number');
+        }
+
+        await sendTriviaQuestionsToRabbitMQ(questionNumber);
+
+        console.log(`Sent to RabbitMQ: ${questionNumber}`);
+        response.send('Trivia questions processing started');
+    } catch (error) {
+        throw new CustomError(500, error);
     }
 };

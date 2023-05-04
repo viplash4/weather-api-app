@@ -6,7 +6,7 @@
     "scripts": {
       "test": "jest",
       "build": "tsc ",
-      "start": "node ../lib/src/index.js"
+      "start": "node ../lib/triviaService/index.js"
     },
     "author": "",
     "license": "ISC",
