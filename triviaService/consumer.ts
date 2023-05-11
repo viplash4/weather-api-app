@@ -15,8 +15,20 @@ export const fetchTriviaQuestions = async (questionNumber) => {
     const transformStream = new Transform({
         objectMode: true,
         transform: async (chunk, encoding, callback) => {
-            questions.push(chunk);
-            callback(null, chunk);
+            try {
+                const question = {
+                    category: chunk.category,
+                    type: chunk.type,
+                    difficulty: chunk.difficulty,
+                    question: chunk.question,
+                    correct_answer: chunk.correct_answer,
+                    incorrect_answers: chunk.incorrect_answers,
+                };
+                await Questions.create(question);
+                callback(null, chunk);
+            } catch (err) {
+                callback(err);
+            }
         },
     });
 
@@ -25,6 +37,7 @@ export const fetchTriviaQuestions = async (questionNumber) => {
             if (err) {
                 reject(err);
             } else {
+                console.log(`questions: ${JSON.stringify(questions)}`);
                 resolve(questions);
             }
         });
@@ -45,10 +58,12 @@ export const connect = async () => {
     await channel.assertQueue(queueName);
     channel.consume(queueName, async (message) => {
         const input = JSON.parse(message.content.toString());
-        console.log(`Received message: ${JSON.stringify(input)}`);
+        console.log(`Received message: ${input}`); //JSON.stringify(input)
+        const questionNumber = input;
+        const questions = await fetchTriviaQuestions(questionNumber);
+        const tableContent = await Questions.findAll();
+        console.log(tableContent);
         channel.ack(message);
-        const count = await Questions.count();
-        console.log(`The database now contains ${count} questions.`);
     });
     console.log(`Waiting for messages...`);
 };
