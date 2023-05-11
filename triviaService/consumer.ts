@@ -1,37 +1,36 @@
 import * as amqp from 'amqplib';
-const queueName = 'trivia-questions';
 import * as JSONStream from 'JSONStream';
 import fetch from 'node-fetch';
-import { Transform } from 'stream';
-
+import { pipeline, Transform } from 'stream';
+import Questions from './models/Questions';
+const queueName = 'trivia-questions';
 export const fetchTriviaQuestions = async (questionNumber) => {
     const API_URL = `https://opentdb.com/api.php?amount=${questionNumber}`;
 
     const questions = [];
 
-    const readableStream = (await fetch(API_URL)).body.pipe(
-        JSONStream.parse('results.*')
-    );
-
+    const fetchData = await fetch(API_URL);
+    const parser = JSONStream.parse('results.*');
+    const readableStream = fetchData.body.pipe(parser);
     const transformStream = new Transform({
         objectMode: true,
-        transform: (chunk, encoding, callback) => {
+        transform: async (chunk, encoding, callback) => {
             questions.push(chunk);
             callback(null, chunk);
         },
     });
 
     return new Promise((resolve, reject) => {
-        readableStream
-            .pipe(transformStream)
-            .on('finish', () => {
-                resolve(questions);
-            })
-            .on('error', (err) => {
+        pipeline(readableStream, transformStream, (err) => {
+            if (err) {
                 reject(err);
-            });
+            } else {
+                resolve(questions);
+            }
+        });
     });
 };
+
 export const connect = async () => {
     let connection;
     while (!connection) {
@@ -48,6 +47,8 @@ export const connect = async () => {
         const input = JSON.parse(message.content.toString());
         console.log(`Received message: ${JSON.stringify(input)}`);
         channel.ack(message);
+        const count = await Questions.count();
+        console.log(`The database now contains ${count} questions.`);
     });
     console.log(`Waiting for messages...`);
 };

@@ -13,9 +13,9 @@ export const sendTriviaQuestionsToRabbitMQ = async (question) => {
     }
 };
 
-export const addToQueue = async (request, response) => {
+export const addToQueue = async (reqData, resData) => {
     try {
-        const questionNumber = Number(request.query.number);
+        const questionNumber = Number(reqData.query.number);
         if (isNaN(questionNumber)) {
             throw new CustomError(401, 'Count must be a number');
         }
@@ -23,7 +23,7 @@ export const addToQueue = async (request, response) => {
         await sendTriviaQuestionsToRabbitMQ(questionNumber);
 
         console.log(`Sent to RabbitMQ: ${questionNumber}`);
-        response.send('Trivia questions processing started');
+        resData.send('Trivia questions processing started');
     } catch (error) {
         throw new CustomError(500, error);
     }
