@@ -13,7 +13,7 @@ export const sendTriviaQuestionsToRabbitMQ = async (question) => {
     }
 };
 
-export const addToQueue = async (reqData, resData) => {
+export const addToQueue = async (reqData) => {
     try {
         const questionNumber = Number(reqData.query.number);
         if (isNaN(questionNumber)) {
@@ -23,7 +23,6 @@ export const addToQueue = async (reqData, resData) => {
         await sendTriviaQuestionsToRabbitMQ(questionNumber);
 
         console.log(`Sent to RabbitMQ: ${questionNumber}`);
-        resData.send('Trivia questions processing started');
     } catch (error) {
         throw new CustomError(500, error);
     }

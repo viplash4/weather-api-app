@@ -11,7 +11,7 @@ export const fetchTriviaQuestions = async (questionNumber) => {
 
     const fetchData = await fetch(API_URL);
     const parser = JSONStream.parse('results.*');
-    const readableStream = fetchData.body.pipe(parser);
+
     const transformStream = new Transform({
         objectMode: true,
         transform: async (chunk, encoding, callback) => {
@@ -33,7 +33,7 @@ export const fetchTriviaQuestions = async (questionNumber) => {
     });
 
     return new Promise((resolve, reject) => {
-        pipeline(readableStream, transformStream, (err) => {
+        pipeline(fetchData.body, parser, transformStream, (err) => {
             if (err) {
                 reject(err);
             } else {
